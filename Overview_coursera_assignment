@@ -9,3 +9,7 @@ I have tried to use the techniques learned in the caret package to do the mungin
 some cross validation to find the best model (via caret of course). I split the data 50/50 as I was having performance issues
 when I split 60/40. The validation dataset spat out results that seemed to show 100% accuracy and no out of sample error which
 I found questionable but I have had no time to dig in too deeply to validate these suspicions. 
+Finally I have applied the model from the training dataset (that was validated on the validate data set) to the 20 test cases
+coursera set out for marking. The only notable thing that I have done here other than use the predict function of the original
+model on to the new data was to ensure that I chopped up the dataset so that it only contained the variables in the original
+model.
