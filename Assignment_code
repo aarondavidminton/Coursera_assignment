@@ -1,0 +1,63 @@
+# Load additional packages required
+library(caret)
+library(randomForest)
+
+# Load training data
+coursera_training <- read.csv("C:\\Users\\aminton\\Downloads\\pml-training.csv",header=T)
+
+dim(coursera_training) # 160 vars and 19622 observations
+
+# Look in to the dep var 
+table(coursera_training[,160])
+
+#Remove missing values 65% threshold 
+vector_remove <- NA
+for (i in 1:length(coursera_training)){
+vector_remove[i] <-  ifelse((sum(!is.na(coursera_training[,i]))/length(coursera_training[,i])) > 0.65
+                         ,1 ,0)
+                }
+
+table(vector_remove) # 67 variables do not make the cut
+
+# Missing values removed
+train_cut1 <- coursera_training[ ,vector_remove == 1]
+
+# Low variation removed using nearZeroVar function learned on machien learning course
+train_cut2 <- nearZeroVar(train_cut1, saveMetrics=TRUE)
+
+train_cut3 <- train_cut1[,train_cut2$nzv == F]
+
+train_cut3 <- train_cut3[,-1] #id not necessary for analysing this data
+
+dim(train_cut3) #Look at new dimensions , down to 58 variables 
+
+#Split in to training and cross validation sets - 50% due to memory issues  
+train_part <- createDataPartition(train_cut3$classe, p = 0.5)[[1]]
+crossv <- train_cut3[-train_part,]
+training <- train_cut3[-train_part,]
+
+# Run a random forest model as there has been no requirement to explain the predictors and the relative impacts
+rf_model<-train(classe~.,data=training,method="rf",
+                trControl=trainControl(method="cv",number=6)) # cross validate 6 times to get the best model
+
+print(rf_model) # view model output
+print(rf_model$finalModel) # view best model output
+
+# Apply model to the 50% of data I held back
+modeltest <- predict(rf_model, crossv)
+
+# apply the confusion matrix to understand false pos/neg - true pos/neg
+confusionMatrix(modeltest, crossv$classe) # 100% accurate apparantly
+
+# load the 20 test cases 
+end_test <- read.csv("C:\\Users\\aminton\\Downloads\\pml-testing.csv",header=T)
+dim(end_test) # check dimensions , variables removed in the original file need to be removed
+
+# Remove the variables not used in the model
+end_test_varsremoved <- end_test[,names(training[,-58])] # need to get rid of the classe var as this is not in the 20 test cases
+
+# apply model using predict function to the test cases
+test_final <- predict(rf_model, end_test_varsremoved)
+
+# Adding the problem_id with my output (A=1 E=5)
+final_var_for_coursera <- as.data.frame(cbind(problem_id=end_test[,160],test_final))
