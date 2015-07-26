@@ -1,0 +1,11 @@
+This problem was approached with a lazy learning style. After some basic exploratory analysis of the data set I quickly 
+understood that it was going to be difficult to approach this assignment with the rigor that would usually be necessary 
+for such a task (I have been exceptionally busy at work due to our year end this week!). So with that in mind I decided 
+that I would attempt the brief directly and merely try to build the best prediction engine that I could. So, other than 
+trimming the fat of the data in the standard approach - remove NA variables on mass and get rid of low/zero variation 
+variables I have not spent my time trying to understand if the remaining variables in the model are sensible or to even 
+understand exactly what they are.
+I have tried to use the techniques learned in the caret package to do the munging and then slapped on a random forest with
+some cross validation to find the best model (via caret of course). I split the data 50/50 as I was having performance issues
+when I split 60/40. The validation dataset spat out results that seemed to show 100% accuracy and no out of sample error which
+I found questionable but I have had no time to dig in too deeply to validate these suspicions. 
